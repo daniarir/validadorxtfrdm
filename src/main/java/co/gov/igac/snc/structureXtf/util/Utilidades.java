@@ -35,11 +35,11 @@ public class Utilidades {
 			return response;
 
 		} catch (Exception e) {
-			throw new AplicacionEstandarDeExcepciones("ClientService", 
+			throw new AplicacionEstandarDeExcepciones("ClientService",
 					  								  "Error al consumir el servicio: " + urlApi,
 					  								  "E409",
 					  								  HttpStatus.CONFLICT.toString(), 
-					  								  e.getMessage(), 
+					  								  "La ruta o directorio especificado es incorrecto: " + e.getMessage(), 
 					  								  "/clientConsumeService");
 		}
 	}

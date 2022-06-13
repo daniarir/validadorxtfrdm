@@ -4,8 +4,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.azure.storage.file.datalake.models.DataLakeStorageException;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -112,9 +110,9 @@ public class validateStructureXtfServiceImpl implements validateStructureXtfServ
 
 			}
 
-		} catch (DataLakeStorageException e) {
-			throw new AplicacionEstandarDeExcepciones("/error/xtfValidatorRdm", "Error interno de azureStorage", "E500",
-					HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.getMessage(), "datalakeAzureStorage");
+		} catch (Exception e) {
+			throw new AplicacionEstandarDeExcepciones("/error/xtfValidatorRdm", "Error interno del servicio", "E500",
+					HttpStatus.INTERNAL_SERVER_ERROR.toString(), e.getMessage(), "xtfValidatorRdm");
 		}
 	}
 }
