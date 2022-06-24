@@ -15,32 +15,36 @@ import reactor.core.publisher.Mono;
 public class Utilidades {
 
 	public static ResponseEntity<?> consumirApi(Map<String, String> peticion, String urlApi) throws AplicacionEstandarDeExcepciones {
+		
 		try {
 			
 			WebClient webClient = WebClient.builder().defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE).build();
-
-			System.out.println("webClient: " + webClient);
 
 			ResponseEntity<?> response = webClient.method(HttpMethod.POST).uri(urlApi)
 												.body(Mono.just(peticion), Map.class)
 												.retrieve()
 												.onStatus(HttpStatus::is4xxClientError, 
 										        		clientResponse ->  clientResponse.bodyToMono(String.class)
-										        		.map(body -> new AplicacionEstandarDeExcepciones(body,"Error al consumir servicio " + urlApi, HttpStatus.CONFLICT)))
+										        		.map(body -> new AplicacionEstandarDeExcepciones(
+										        				"/error/xtfValidatorRdm",
+										        				"Error al consumir el servicio: " + urlApi,
+										        				"E409",
+										        				 "409 - Conflicto",
+										        				 body,
+										        				 "Util - Consumir Api"
+										        				)))
 												.toEntity(String.class)
 												.block();
-			
-			System.out.println("respuesta: " + response);
 
 			return response;
 
 		} catch (Exception e) {
-			throw new AplicacionEstandarDeExcepciones("ClientService",
-					  								  "Error al consumir el servicio: " + urlApi,
-					  								  "E409",
-					  								  HttpStatus.CONFLICT.toString(), 
-					  								  "La ruta o directorio especificado es incorrecto: " + e.getMessage(), 
-					  								  "/clientConsumeService");
+			throw new AplicacionEstandarDeExcepciones("/error/xtfValidatorRdm",
+					  								  "Servicio interno del servidor",
+					  								  "E500",
+					  								  "500 - Error interno del servicio", 
+					  								  "La ruta o directorio especificado es incorrecto o el archivo no existe", 
+					  								  "Util - Consumir Api");
 		}
 	}
 

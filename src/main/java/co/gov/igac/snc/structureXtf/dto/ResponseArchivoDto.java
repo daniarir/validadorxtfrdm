@@ -1,10 +1,24 @@
 package co.gov.igac.snc.structureXtf.dto;
 
 public class ResponseArchivoDto {
-	private String rutaArchivo;
-	private String nombreArchivoValidado;
-	private String codigoStatus;
 	
+	private String rutaArchivo;
+	private String nombreArchivo;
+	private String codigoStatus;
+	private String origen;
+	
+	public ResponseArchivoDto() {
+		
+	}	
+	
+	public String getOrigen() {
+		return origen;
+	}
+
+	public void setOrigen(String origen) {
+		this.origen = origen;
+	}
+
 	public String getRutaArchivo() {
 		return rutaArchivo;
 	}
@@ -12,15 +26,15 @@ public class ResponseArchivoDto {
 	public void setRutaArchivo(String rutaArchivo) {
 		this.rutaArchivo = rutaArchivo;
 	}
-	
-	public String getNombreArchivoValidado() {
-		return nombreArchivoValidado;
+
+	public String getNombreArchivo() {
+		return nombreArchivo;
 	}
-	
-	public void setNombreArchivoValidado(String nombreArchivoValidado) {
-		this.nombreArchivoValidado = nombreArchivoValidado;
+
+	public void setNombreArchivo(String nombreArchivo) {
+		this.nombreArchivo = nombreArchivo;
 	}
-	
+
 	public String getCodigoStatus() {
 		return codigoStatus;
 	}
@@ -29,6 +43,5 @@ public class ResponseArchivoDto {
 		this.codigoStatus = codigoStatus;
 	}
 
-	public ResponseArchivoDto() {
-	}
+	
 }

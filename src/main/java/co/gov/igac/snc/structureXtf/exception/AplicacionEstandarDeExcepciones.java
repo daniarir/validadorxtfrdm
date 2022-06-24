@@ -27,8 +27,20 @@ public class AplicacionEstandarDeExcepciones extends Exception{
 		this.title = title;
 		this.code = code;
 		this.status = status;
-		this.detail = detail;
 		this.instance = instance;
+		this.detail = detail;
+		
+	}
+	
+	
+	public AplicacionEstandarDeExcepciones(String type, String title, String code, HttpStatus status, String detail, String instance) {
+		this.type = type;
+		this.title = title;
+		this.code = code;
+		this.statusmessageClient = status;
+		this.instance = instance;
+		this.detail = detail;
+		
 	}
 	
 	public AplicacionEstandarDeExcepciones(String mensaje, String titulo, HttpStatus estado) {
@@ -100,8 +112,4 @@ public class AplicacionEstandarDeExcepciones extends Exception{
 	public void setTituloClient(String tituloClient) {
 		this.tituloClient = tituloClient;
 	}
-	
-	
-	
-	
 }
