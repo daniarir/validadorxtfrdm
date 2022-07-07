@@ -26,9 +26,8 @@ public class validateStructureXtfServiceImpl implements validateStructureXtfServ
 	private Propiedades propiedades;
 	private final iliValidator ilivalidator = new iliValidator();
 
-//	Validar si esta BIEN la estructura o NO
-	public ResponseArchivoDto validarXtf(String rutaAzureDownload, String nombreArchivo, String origen)
-			throws AplicacionEstandarDeExcepciones {
+//	   Validar si esta BIEN la estructura o NO
+	   public ResponseArchivoDto validarXtf(String rutaAzureDownload, String nombreArchivo, String origen) throws AplicacionEstandarDeExcepciones {
 
 		ResponseArchivoDto response = new ResponseArchivoDto();
 		String status = null;
@@ -36,6 +35,7 @@ public class validateStructureXtfServiceImpl implements validateStructureXtfServ
 		Map<String, String> peticionDescargarArchivo = new HashMap<>();
 		ResponseEntity<?> respuestApi = null;
 		String typeProcess = "";
+		Boolean valor;
 
 //		PROPERTIES
 		String pathDefault = propiedades.getPathDefaultAzure();
@@ -50,7 +50,7 @@ public class validateStructureXtfServiceImpl implements validateStructureXtfServ
 
 		peticionDescargarArchivo.put("rutaStorage", rutaAzureDownload);
 		peticionDescargarArchivo.put("nombreArchivo", nombreArchivo);
-		respuestApi = Utilidades.consumirApi(peticionDescargarArchivo, urlDownload);
+		respuestApi = Utilidades.consumirApiValidacionXTF(peticionDescargarArchivo, urlDownload);
 
 		try {
 
@@ -74,23 +74,19 @@ public class validateStructureXtfServiceImpl implements validateStructureXtfServ
 						"ilivalidator");
 			} else {
 
-				Boolean valor = Validator.runValidation(convertRoute, settingIli);
+				valor = Validator.runValidation(convertRoute, settingIli);
 
 				if (valor.equals(false)) {
 					status = "0";
 					typeProcess = "/NoProcesados";
 					if (origen.equals("IGAC")) {
-
 						peticionSubirArchivo.put("rutaArchivo", convertRoute);
 						peticionSubirArchivo.put("rutaStorage", pathDefault + typeProcess);
 						peticionSubirArchivo.put("nombreArchivo", nombreArchivo);
-						respuestApi = Utilidades.consumirApi(peticionSubirArchivo, urlUpload);
-
 					} else if (origen.equals("SNR")) {
 						peticionSubirArchivo.put("rutaArchivo", convertRoute);
 						peticionSubirArchivo.put("rutaStorage", pathDefault + typeProcess);
 						peticionSubirArchivo.put("nombreArchivo", nombreArchivo);
-						respuestApi = Utilidades.consumirApi(peticionSubirArchivo, urlUpload);
 					}
 				} else {
 					status = "1";
@@ -99,36 +95,26 @@ public class validateStructureXtfServiceImpl implements validateStructureXtfServ
 						peticionSubirArchivo.put("rutaArchivo", convertRoute);
 						peticionSubirArchivo.put("rutaStorage", pathDefault + typeProcess);
 						peticionSubirArchivo.put("nombreArchivo", nombreArchivo);
-						respuestApi = Utilidades.consumirApi(peticionSubirArchivo, urlUpload);
-
 					} else if (origen.equals("SNR")) {
 						peticionSubirArchivo.put("rutaArchivo", convertRoute);
 						peticionSubirArchivo.put("rutaStorage", pathDefault + typeProcess);
 						peticionSubirArchivo.put("nombreArchivo", nombreArchivo);
-						respuestApi = Utilidades.consumirApi(peticionSubirArchivo, urlUpload);
 					}
 				}
-
-				try {
-					ilivalidator.configLogIlivalidator(valor, pathLog);
-				} catch (Exception e) {
-					throw new AplicacionEstandarDeExcepciones("/error/xtfValidatorRdm", "Ilivalidator", "E500",
-							"500 - Error interno del servicio", "Error al configurar el log en formato JSON " + e.getMessage(),
-							"iliValidator");
-				}
-
-				response.setRutaArchivo(pathDefault + typeProcess);
-				response.setNombreArchivo(nombreArchivo);
-				response.setCodigoStatus(status);
-				response.setOrigen(origen);
-				return response;
 			}
-
 		} catch (Exception e) {
 			throw new AplicacionEstandarDeExcepciones("/error/xtfValidatorRdm", "xtfValidatorRdm", "E500",
 					"500 - Error interno del servicio", "Error en la implantacion del servicio: ",
 					"validateStructureImpl");
 		}
-
+		
+		respuestApi = Utilidades.consumirApiValidacionXTF(peticionSubirArchivo, urlUpload);
+		ilivalidator.configLogIlivalidator(valor, pathLog, nombreArchivo, origen, urlUpload);
+		
+		response.setRutaArchivo(pathDefault + typeProcess);
+		response.setNombreArchivo(nombreArchivo);
+		response.setCodigoStatus(status);
+		response.setOrigen(origen);
+		return response;
 	}
 }

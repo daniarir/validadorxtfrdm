@@ -13,6 +13,8 @@ import org.interlis2.validator.Validator;
 
 import ch.ehi.basics.settings.Settings;
 import co.gov.igac.snc.structureXtf.exception.AplicacionEstandarDeExcepciones;
+import co.gov.igac.snc.structureXtf.util.Utilidades;
+
 import org.json.*;
 
 public class iliValidator {
@@ -35,17 +37,26 @@ public class iliValidator {
 
 		} catch (Exception e) {
 			throw new AplicacionEstandarDeExcepciones("/error/xtfValidatorRdm", "Ilivalidator", "E500",
-					"500 - Error interno del servicio", "Error al configurar los settings de la libreria iliValidator" + e.getMessage(),
-					"iliValidator");
+					"500 - Error interno del servicio",
+					"Error al configurar los settings de la libreria iliValidator" + e.getMessage(), "iliValidator");
 		}
 	}
 
-	public void configLogIlivalidator(Boolean validate, File pathLogJson) throws AplicacionEstandarDeExcepciones {
-		
-		// El log que deja la libreria IliValidator, el archivo .LOG no se puede manipular mientras el .JAR de iliValidator se esta ejecutando,
+	public void configLogIlivalidator(Boolean validate, File pathLogJson, String nombreArchivo, String origen, String urlUpload) throws AplicacionEstandarDeExcepciones {
+
+		// El log que deja la libreria IliValidator, el archivo .LOG no se puede
+		// manipular mientras el .JAR de iliValidator se esta ejecutando,
 		// Por lo tanto es imposible Combinar o eliminar el archivo .LOG
 
 		String pathLog = pathLogJson.getPath().replace(".json", ".log");
+		Map<String, String> peticionSubirArchivo = new HashMap<>();
+		String[] pathSplitNombreArchivo = nombreArchivo.split("_");
+		String[] pathSplit = pathLogJson.getPath().split("\\\\");
+		String pathFinish = pathSplit[0] + "\\" + pathSplit[1] + "\\" + pathSplitNombreArchivo[1] + "_"
+				+ pathSplitNombreArchivo[2].replace(".xtf", "_ValidacionXTF.json");
+		String nombreArchivoStorage = pathSplitNombreArchivo[1] + "_"
+				+ pathSplitNombreArchivo[2].replace(".xtf", "_ValidacionXTF.json");
+		String rutaStorage = "procesoRDM/JSON/";
 
 		File doc = new File(pathLog);
 		try (BufferedReader obj = new BufferedReader(new FileReader(doc))) {
@@ -56,7 +67,6 @@ public class iliValidator {
 			Pattern paError = Pattern.compile("Error:");
 
 			JSONObject objectLog = new JSONObject();
-			JSONObject header = new JSONObject();
 			JSONObject data = new JSONObject();
 			JSONArray arrayLog = new JSONArray();
 			JSONArray arrayErrorLog = new JSONArray();
@@ -124,13 +134,28 @@ public class iliValidator {
 				}
 			}
 
-			header.put("ValidationIliValidator", data);
-
-			FileWriter file = new FileWriter(pathLogJson);
-			file.write(header.toString());
+			FileWriter file = new FileWriter(pathFinish);
+			file.write(data.toString());
 			file.flush();
 			file.close();
-			
+
+			if (origen.equals("SNR")) {
+				peticionSubirArchivo.put("rutaArchivo", pathFinish);
+				peticionSubirArchivo.put("rutaStorage", rutaStorage + origen + "/" + pathSplitNombreArchivo[1]);
+				peticionSubirArchivo.put("nombreArchivo", nombreArchivoStorage);
+			} else {
+				peticionSubirArchivo.put("rutaArchivo", pathFinish);
+				peticionSubirArchivo.put("rutaStorage", rutaStorage + origen + "/" + pathSplitNombreArchivo[1]);
+				peticionSubirArchivo.put("nombreArchivo", nombreArchivoStorage);
+			}
+
+			try {
+				Utilidades.consumirApiValidacionXTF(peticionSubirArchivo, urlUpload);
+			} catch (Exception e) {
+				throw new AplicacionEstandarDeExcepciones("/error/xtfValidatorRdm", "Ilivalidator", "E500",
+						"500 - Error interno del servicio",
+						"Error al configurar el log en formato JSON " + e.getMessage(), "iliValidator");
+			}
 		} catch (Exception e) {
 			throw new AplicacionEstandarDeExcepciones("/error/xtfValidatorRdm", "Ilivalidator", "E500",
 					"500 - Error interno del servicio", "Error al configurar el log en formato JSON " + e.getMessage(),

@@ -43,5 +43,9 @@ public class ResponseArchivoDto {
 		this.codigoStatus = codigoStatus;
 	}
 
-	
+	@Override
+	public String toString() {
+		return "ResponseArchivoDto [rutaArchivo=" + rutaArchivo + ", nombreArchivo=" + nombreArchivo + ", codigoStatus="
+				+ codigoStatus + ", origen=" + origen + "]";
+	}
 }

@@ -7,20 +7,21 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.reactive.function.client.WebClient;
 import co.gov.igac.snc.structureXtf.exception.AplicacionEstandarDeExcepciones;
 import reactor.core.publisher.Mono;
 
 public class Utilidades {
 
-	public static ResponseEntity<?> consumirApi(Map<String, String> peticion, String urlApi) throws AplicacionEstandarDeExcepciones {
+	public static ResponseEntity<?> consumirApiValidacionXTF(Map<String, String> peticion, String urlApi) throws AplicacionEstandarDeExcepciones {
+		
+		ResponseEntity<?> response;
 		
 		try {
 			
 			WebClient webClient = WebClient.builder().defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE).build();
 
-			ResponseEntity<?> response = webClient.method(HttpMethod.POST).uri(urlApi)
+			response = webClient.method(HttpMethod.POST).uri(urlApi)
 												.body(Mono.just(peticion), Map.class)
 												.retrieve()
 												.onStatus(HttpStatus::is4xxClientError, 
@@ -35,9 +36,7 @@ public class Utilidades {
 										        				)))
 												.toEntity(String.class)
 												.block();
-
 			return response;
-
 		} catch (Exception e) {
 			throw new AplicacionEstandarDeExcepciones("/error/xtfValidatorRdm",
 					  								  "Servicio interno del servidor",
@@ -46,6 +45,6 @@ public class Utilidades {
 					  								  "La ruta o directorio especificado es incorrecto o el archivo no existe", 
 					  								  "Util - Consumir Api");
 		}
+		
 	}
-
 }
