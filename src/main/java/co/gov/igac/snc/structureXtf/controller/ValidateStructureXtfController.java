@@ -35,7 +35,7 @@ public class ValidateStructureXtfController {
 	@PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
 	public ResponseEntity<?> validateStructureXtf(@RequestBody RequestArchivoDTO data) {
 		try {
-			
+			System.out.println("inicio - validateStructureXtf");
 			ResponseArchivoDto dto = service.validarXtf(data.getRutaArchivo(), data.getNombreArchivo(), data.getOrigen());
 			
 			if (usaKafka) {
@@ -50,9 +50,11 @@ public class ValidateStructureXtfController {
 					kafkaProducer.send(dtoKafka);
 				}
 			}
-			
+
+			System.out.println("fin - validateStructureXtf - OK");
 			return new ResponseEntity<>(dto,HttpStatus.OK);
 		} catch (AplicacionEstandarDeExcepciones ex) {
+			System.out.println("fin - validateStructureXtf - NOK");
 			return new ResponseEntity<>(new ResponseErrorDTO(ex),HttpStatus.OK);
 		}
 	}

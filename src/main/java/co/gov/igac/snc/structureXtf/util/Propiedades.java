@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 
 @Configuration
 @PropertySource("classpath:validatrStructureXtf.properties")
-@NoArgsConstructor
 @Component
 public class Propiedades {
 

@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,6 +13,10 @@ import co.gov.igac.snc.structureXtf.service.validateStructureXtfService;
 import co.gov.igac.snc.structureXtf.util.Utilidades;
 import co.gov.igac.snc.structureXtf.util.Propiedades;
 
+import org.apache.commons.io.FileDeleteStrategy;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.interlis2.validator.Validator;
 
 import ch.ehi.basics.settings.Settings;
@@ -21,6 +26,8 @@ import co.gov.igac.snc.structureXtf.exception.AplicacionEstandarDeExcepciones;
 
 @Service
 public class validateStructureXtfServiceImpl implements validateStructureXtfService {
+	
+	private final Log log = LogFactory.getLog(getClass());
 
 	@Autowired
 	private Propiedades propiedades;
@@ -52,9 +59,9 @@ public class validateStructureXtfServiceImpl implements validateStructureXtfServ
 		peticionDescargarArchivo.put("nombreArchivo", nombreArchivo);
 		respuestApi = Utilidades.consumirApiValidacionXTF(peticionDescargarArchivo, urlDownload);
 
-		try {
+		String pathConvert = respuestApi.getBody().toString();
 
-			String pathConvert = respuestApi.getBody().toString();
+		try {
 
 			String[] splitRoute = new File(pathConvert).getPath().split("\\\\");
 
@@ -73,7 +80,7 @@ public class validateStructureXtfServiceImpl implements validateStructureXtfServ
 						"405 - Metodo No Permitido", "Validacion del archivo XTF no permitido: " + nombreArchivo,
 						"ilivalidator");
 			} else {
-
+				
 				valor = Validator.runValidation(convertRoute, settingIli);
 
 				if (valor.equals(false)) {
@@ -115,6 +122,14 @@ public class validateStructureXtfServiceImpl implements validateStructureXtfServ
 		response.setNombreArchivo(nombreArchivo);
 		response.setCodigoStatus(status);
 		response.setOrigen(origen);
+		eliminarArchivo(new File(pathConvert));
 		return response;
+	}
+		
+	private void eliminarArchivo(File archivo) {
+		if(archivo.exists()) {
+			System.gc();
+			log.info("File Eliminar archivo " + archivo.getPath() + ": " + archivo.delete());
+		}
 	}
 }

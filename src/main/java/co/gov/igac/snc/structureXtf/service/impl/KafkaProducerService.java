@@ -17,7 +17,7 @@ public class KafkaProducerService {
     @Autowired
     private KafkaTemplate<String, ResponseArchivoDtoKafka> kafkaTemplate;
 
-    String kafkaTopic = "validacionXTF";
+    String kafkaTopic = "ValidacionXTF";
 
     public void send(ResponseArchivoDtoKafka user) {
         LOG.info("Sending User Json Serializer Kafka: ", user);

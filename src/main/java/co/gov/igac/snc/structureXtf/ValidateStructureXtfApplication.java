@@ -1,4 +1,4 @@
-package co.gov.igac;
+package co.gov.igac.snc.structureXtf;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
