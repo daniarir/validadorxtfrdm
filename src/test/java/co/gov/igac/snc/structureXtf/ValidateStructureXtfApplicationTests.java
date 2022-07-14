@@ -1,4 +1,4 @@
-package co.gov.igac;
+package co.gov.igac.snc.structureXtf;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
