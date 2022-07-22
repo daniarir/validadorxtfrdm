@@ -35,4 +35,8 @@ public class RequestArchivoDTO {
 		this.nombreArchivo = nombreArchivo;
 		this.origen = origen;
 	}
+	
+	public RequestArchivoDTO() {
+		
+	}
 }
