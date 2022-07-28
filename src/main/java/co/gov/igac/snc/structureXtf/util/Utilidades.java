@@ -13,9 +13,9 @@ import reactor.core.publisher.Mono;
 
 public class Utilidades {
 
-	public static ResponseEntity<?> consumirApiValidacionXTF(Map<String, String> peticion, String urlApi) throws AplicacionEstandarDeExcepciones {
+	public static ResponseEntity<String> consumirApiValidacionXTF(Map<String, String> peticion, String urlApi) throws AplicacionEstandarDeExcepciones {
 		
-		ResponseEntity<?> response;
+		ResponseEntity<String> response;
 		
 		try {
 			

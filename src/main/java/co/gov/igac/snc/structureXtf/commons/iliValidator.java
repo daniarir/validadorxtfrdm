@@ -22,7 +22,7 @@ public class iliValidator {
 	public Settings configIliValidator(String iliDirs, String modelNames, File pathLog) throws AplicacionEstandarDeExcepciones {
 
 		try {
-
+			
 			String path = pathLog.getPath().replace(".json", ".log");
 
 //			Config IliValidator
