@@ -7,8 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
-import lombok.NoArgsConstructor;
-
 @Configuration
 @PropertySource("classpath:validatrStructureXtf.properties")
 @Component
@@ -101,6 +99,4 @@ public class Propiedades {
 				+ ", pathDefaultAzure=" + pathDefaultAzure + ", fileSystemClient=" + fileSystemClient + ", iliDirs="
 				+ iliDirs + ", modelNames=" + modelNames + "]";
 	}
-	
-	
 }

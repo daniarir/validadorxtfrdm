@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,8 +12,6 @@ import co.gov.igac.snc.structureXtf.service.validateStructureXtfService;
 import co.gov.igac.snc.structureXtf.util.Utilidades;
 import co.gov.igac.snc.structureXtf.util.Propiedades;
 
-import org.apache.commons.io.FileDeleteStrategy;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.interlis2.validator.Validator;
@@ -35,7 +32,7 @@ public class validateStructureXtfServiceImpl implements validateStructureXtfServ
 
 //	   Validar si esta BIEN la estructura o NO
 	   public ResponseArchivoDto validarXtf(String rutaAzureDownload, String nombreArchivo, String origen) throws AplicacionEstandarDeExcepciones {
-
+		   
 		ResponseArchivoDto response = new ResponseArchivoDto();
 		String status = null;
 		Map<String, String> peticionSubirArchivo = new HashMap<>();

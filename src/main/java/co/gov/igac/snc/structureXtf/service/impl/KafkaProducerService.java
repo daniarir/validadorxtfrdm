@@ -17,10 +17,10 @@ public class KafkaProducerService {
     @Autowired
     private KafkaTemplate<String, ResponseArchivoDtoKafka> kafkaTemplate;
 
-    String kafkaTopic = "ValidacionXTF";
+    private final String KAFKA_TOPIC = "validacion-xtf";
 
     public void send(ResponseArchivoDtoKafka user) {
         LOG.info("Sending User Json Serializer Kafka: ", user);
-        kafkaTemplate.send(kafkaTopic, user);
+        kafkaTemplate.send(KAFKA_TOPIC, user);
     }
 }
