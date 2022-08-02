@@ -12,11 +12,11 @@
 	</parent>
 
 	<groupId>co.gov.igac</groupId>
-	<artifactId>validateStructureXtf</artifactId>
+	<artifactId>validate-structure-xtf</artifactId>
 	<version>1.0</version>
-
-	<name>validateStructureXtf</name>
+	<name>validate-structure-xtf</name>
 	<description>Validar estructura de archivos XTF</description>
+	<packaging>jar</packaging>
 
 	<properties>
 		<java.version>11</java.version>
@@ -170,21 +170,11 @@
 		</plugins>
 	</build>
 
-	<dependencyManagement>
-		<dependencies>
-
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-devtools</artifactId>
-				<scope>runtime</scope>
-				<optional>true</optional>
-			</dependency>
-
-			<dependency>
-				<groupId>org.springdoc</groupId>
-				<artifactId>springdoc-openapi-ui</artifactId>
-				<version>1.6.8</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+	<distributionManagement>
+		<repository>
+			<id>igac</id>
+			<name>Repositorio IGAC releases</name>
+			<url>http://nexus-repo.apps.igac.gov.co/repository/igac-releases/</url>
+		</repository>
+	</distributionManagement>
 </project>
