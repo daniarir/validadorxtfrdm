@@ -85,11 +85,11 @@ public class validateStructureXtfServiceImpl implements validateStructureXtfServ
 					typeProcess = "/NoProcesados";
 					if (origen.equals("IGAC")) {
 						peticionSubirArchivo.put("rutaArchivo", convertRoute);
-						peticionSubirArchivo.put("rutaStorage", pathDefault + typeProcess);
+						peticionSubirArchivo.put("rutaStorage", pathDefault + origen + typeProcess);
 						peticionSubirArchivo.put("nombreArchivo", nombreArchivo);
 					} else if (origen.equals("SNR")) {
 						peticionSubirArchivo.put("rutaArchivo", convertRoute);
-						peticionSubirArchivo.put("rutaStorage", pathDefault + typeProcess);
+						peticionSubirArchivo.put("rutaStorage", pathDefault + origen + typeProcess);
 						peticionSubirArchivo.put("nombreArchivo", nombreArchivo);
 					}
 				} else {
@@ -97,11 +97,11 @@ public class validateStructureXtfServiceImpl implements validateStructureXtfServ
 					typeProcess = "/Procesados";
 					if (origen.equals("IGAC")) {
 						peticionSubirArchivo.put("rutaArchivo", convertRoute);
-						peticionSubirArchivo.put("rutaStorage", pathDefault + typeProcess);
+						peticionSubirArchivo.put("rutaStorage", pathDefault + origen + typeProcess);
 						peticionSubirArchivo.put("nombreArchivo", nombreArchivo);
 					} else if (origen.equals("SNR")) {
 						peticionSubirArchivo.put("rutaArchivo", convertRoute);
-						peticionSubirArchivo.put("rutaStorage", pathDefault + typeProcess);
+						peticionSubirArchivo.put("rutaStorage", pathDefault + origen + typeProcess);
 						peticionSubirArchivo.put("nombreArchivo", nombreArchivo);
 					}
 				}
@@ -115,7 +115,7 @@ public class validateStructureXtfServiceImpl implements validateStructureXtfServ
 		respuestApi = Utilidades.consumirApiValidacionXTF(peticionSubirArchivo, urlUpload);
 		ilivalidator.configLogIlivalidator(valor, pathLog, nombreArchivo, origen, urlUpload);
 		
-		response.setRutaArchivo(pathDefault + typeProcess);
+		response.setRutaArchivo(pathDefault +  origen + typeProcess);
 		response.setNombreArchivo(nombreArchivo);
 		response.setCodigoStatus(status);
 		response.setOrigen(origen);
