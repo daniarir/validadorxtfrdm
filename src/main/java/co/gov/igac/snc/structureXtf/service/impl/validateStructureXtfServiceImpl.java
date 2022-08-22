@@ -1,6 +1,7 @@
 package co.gov.igac.snc.structureXtf.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -8,7 +9,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import co.gov.igac.snc.structureXtf.service.validateStructureXtfService;
+import co.gov.igac.snc.structureXtf.service.IvalidateStructureXtfService;
 import co.gov.igac.snc.structureXtf.util.Utilidades;
 import co.gov.igac.snc.structureXtf.util.Propiedades;
 
@@ -17,23 +18,25 @@ import org.apache.commons.logging.LogFactory;
 import org.interlis2.validator.Validator;
 
 import ch.ehi.basics.settings.Settings;
-import co.gov.igac.snc.structureXtf.commons.iliValidator;
-import co.gov.igac.snc.structureXtf.dto.ResponseArchivoDto;
-import co.gov.igac.snc.structureXtf.exception.AplicacionEstandarDeExcepciones;
+import co.gov.igac.snc.structureXtf.config.IliValidator;
+import co.gov.igac.snc.structureXtf.dto.ResponseArchivoDTO;
+import co.gov.igac.snc.structureXtf.exception.ExcepcionLecturaDeArchivo;
+import co.gov.igac.snc.structureXtf.exception.ExcepcionPropertiesNoExiste;
+import co.gov.igac.snc.structureXtf.exception.ExcepcionesDeNegocio;
 
 @Service
-public class validateStructureXtfServiceImpl implements validateStructureXtfService {
+public class ValidateStructureXtfServiceImpl implements IvalidateStructureXtfService {
 	
 	private final Log log = LogFactory.getLog(getClass());
 
 	@Autowired
 	private Propiedades propiedades;
-	private final iliValidator ilivalidator = new iliValidator();
+	private final IliValidator ilivalidator = new IliValidator();
 
-//	   Validar si esta BIEN la estructura o NO
-	   public ResponseArchivoDto validarXtf(String rutaAzureDownload, String nombreArchivo, String origen) throws AplicacionEstandarDeExcepciones {
+//	Validar si esta BIEN la estructura o NO
+	public ResponseArchivoDTO validarXtf(String rutaAzureDownload, String nombreArchivo, String origen) throws ExcepcionPropertiesNoExiste, ExcepcionLecturaDeArchivo, ExcepcionesDeNegocio {
 		   
-		ResponseArchivoDto response = new ResponseArchivoDto();
+		ResponseArchivoDTO response = new ResponseArchivoDTO();
 		String status = null;
 		Map<String, String> peticionSubirArchivo = new HashMap<>();
 		Map<String, String> peticionDescargarArchivo = new HashMap<>();
@@ -48,7 +51,11 @@ public class validateStructureXtfServiceImpl implements validateStructureXtfServ
 		String iliDirs = propiedades.getIliDirs();
 		String modelNames = propiedades.getModelNames();
 		File pathLog = propiedades.getPathLogJSON();
-
+		
+		if (pathDefault.isEmpty() || urlDownload.isEmpty() || urlUpload.isEmpty() || iliDirs.isEmpty() || modelNames.isEmpty() || pathLog.toString().isEmpty()) {
+			throw new ExcepcionPropertiesNoExiste("No se encontro datos en el properties: ", HttpStatus.NOT_FOUND);
+		}
+		
 //		Inicializar configuraciones de la libreria IliValidator
 		Settings settingIli = ilivalidator.configIliValidator(iliDirs, modelNames, pathLog);
 
@@ -56,6 +63,12 @@ public class validateStructureXtfServiceImpl implements validateStructureXtfServ
 		peticionDescargarArchivo.put("nombreArchivo", nombreArchivo);
 		respuestApi = Utilidades.consumirApiValidacionXTF(peticionDescargarArchivo, urlDownload);
 
+		if(!respuestApi.getStatusCode().is2xxSuccessful()) {
+			throw new ExcepcionesDeNegocio(respuestApi.getBody().toString(),
+					"Error consumiendo " + peticionDescargarArchivo,
+					HttpStatus.CONFLICT);
+		}
+		
 		String pathConvert = respuestApi.getBody().toString();
 
 		try {
@@ -73,9 +86,9 @@ public class validateStructureXtfServiceImpl implements validateStructureXtfServ
 			String extensionFile = nombreArchivo.toLowerCase().substring(nombreArchivo.length() - 4, nombreArchivo.length());
 
 			if (!extensionFile.equals(".xtf")) {
-				throw new AplicacionEstandarDeExcepciones("/error/xtfValidatorRdm", "Metodo no permitido", "E405",
-						"405 - Metodo No Permitido", "Validacion del archivo XTF no permitido: " + nombreArchivo,
-						"ilivalidator");
+				throw new ExcepcionesDeNegocio("/error/xtfValidatorRdm",
+						"Validacion del archivo XTF no permitido: " + extensionFile,
+						HttpStatus.INTERNAL_SERVER_ERROR);
 			} else {
 				
 				valor = Validator.runValidation(convertRoute, settingIli);
@@ -107,12 +120,20 @@ public class validateStructureXtfServiceImpl implements validateStructureXtfServ
 				}
 			}
 		} catch (Exception e) {
-			throw new AplicacionEstandarDeExcepciones("/error/xtfValidatorRdm", "xtfValidatorRdm", "E500",
-					"500 - Error interno del servicio", "Error en la implantacion del servicio: ",
-					"validateStructureImpl");
+			throw new ExcepcionesDeNegocio("/error/xtfValidatorRdm",
+					"Error en la implantacion del servicio:: " + e.getMessage(),
+					HttpStatus.INTERNAL_SERVER_ERROR);
+			
 		}
 		
 		respuestApi = Utilidades.consumirApiValidacionXTF(peticionSubirArchivo, urlUpload);
+		
+		if(!respuestApi.getStatusCode().is2xxSuccessful()) {
+			throw new ExcepcionesDeNegocio(respuestApi.getBody().toString(),
+					"Error consumiendo " + peticionSubirArchivo,
+					HttpStatus.CONFLICT);
+		}
+		
 		ilivalidator.configLogIlivalidator(valor, pathLog, nombreArchivo, origen, urlUpload);
 		
 		response.setRutaArchivo(pathDefault +  origen + typeProcess);

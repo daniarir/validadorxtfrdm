@@ -1,13 +1,13 @@
 package co.gov.igac.snc.structureXtf.dto;
 
-public class ResponseArchivoDto {
+public class ResponseArchivoDTO {
 	
 	private String rutaArchivo;
 	private String nombreArchivo;
 	private String codigoStatus;
 	private String origen;
 	
-	public ResponseArchivoDto() {
+	public ResponseArchivoDTO() {
 		
 	}	
 	

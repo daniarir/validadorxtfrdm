@@ -1,115 +1,81 @@
 package co.gov.igac.snc.structureXtf.exception;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import co.gov.igac.snc.structureXtf.dto.EstandarDeExcepcionesDTO;
 /**
  * 
  * @author gilber.lemus
  * @version 1.0
  */
-public class AplicacionEstandarDeExcepciones extends Exception{
+@RestControllerAdvice
+public class AplicacionEstandarDeExcepciones {
 	
-	private static final long serialVersionUID = 1L;
-	private String type;
-	private String title;
-	private String code;
-	private String status;
-	private String detail;
-	private String instance;
-	private String tituloClient;
-	private HttpStatus statusmessageClient;
-
-	public AplicacionEstandarDeExcepciones() {
-	}
-
-	public AplicacionEstandarDeExcepciones(String type, String title, String code, String status, String detail, String instance) {
-		this.type = type;
-		this.title = title;
-		this.code = code;
-		this.status = status;
-		this.instance = instance;
-		this.detail = detail;
-		
+	private final Log log = LogFactory.getLog(getClass());
+	
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<EstandarDeExcepcionesDTO> handleNoContentException(Exception ex){
+		log.error(ex);
+		EstandarDeExcepcionesDTO respuesta = new EstandarDeExcepcionesDTO.ExceptionBuilder()
+				.tipo("Exception")
+				.titulo("Error interno")
+				.codigo("E100")
+				.estado(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR))
+				.detalle(ex.getMessage())
+				.instancia("/xtfValidatorRdm")
+				.builder();
+		return new ResponseEntity<EstandarDeExcepcionesDTO>(respuesta, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	
-	public AplicacionEstandarDeExcepciones(String type, String title, String code, HttpStatus status, String detail, String instance) {
-		this.type = type;
-		this.title = title;
-		this.code = code;
-		this.statusmessageClient = status;
-		this.instance = instance;
-		this.detail = detail;
-		
+	@ExceptionHandler(ExcepcionPropertiesNoExiste.class)
+	public ResponseEntity<EstandarDeExcepcionesDTO> handleNoContentException(ExcepcionPropertiesNoExiste ex){
+		log.error(ex);
+		HttpStatus estado = ex.getEstado() == null ? HttpStatus.NOT_IMPLEMENTED : ex.getEstado();
+		EstandarDeExcepcionesDTO respuesta = new EstandarDeExcepcionesDTO.ExceptionBuilder()
+				.tipo("FileNotFoundException")
+				.titulo("Error de archivo no encontrado")
+				.codigo("E100")
+				.estado(String.valueOf(estado.value()))
+				.detalle(ex.getMessage())
+				.instancia("/xtfValidatorRdm")
+				.builder();
+		return new ResponseEntity<EstandarDeExcepcionesDTO>(respuesta, estado);
 	}
 	
-	public AplicacionEstandarDeExcepciones(String mensaje, String titulo, HttpStatus estado) {
-		super(mensaje);
-		this.statusmessageClient = estado;
-		this.tituloClient = titulo;
+	@ExceptionHandler(ExcepcionLecturaDeArchivo.class)
+	public ResponseEntity<EstandarDeExcepcionesDTO> handleNoContentException(ExcepcionLecturaDeArchivo ex){
+		log.error(ex);
+		HttpStatus estado = ex.getEstado() == null ? HttpStatus.NOT_IMPLEMENTED : ex.getEstado();
+		EstandarDeExcepcionesDTO respuesta = new EstandarDeExcepcionesDTO.ExceptionBuilder()
+				.tipo("IOException")
+				.titulo("Error de lectura de archivo")
+				.codigo("E200")
+				.estado(String.valueOf(estado.value()))
+				.detalle(ex.getMessage())
+				.instancia("/xtfValidatorRdm")
+				.builder();
+		return new ResponseEntity<EstandarDeExcepcionesDTO>(respuesta, estado);
 	}
+	
 
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
-	}
-
-	public String getDetail() {
-		return detail;
-	}
-
-	public void setDetail(String detail) {
-		this.detail = detail;
-	}
-
-	public String getInstance() {
-		return instance;
-	}
-
-	public void setInstance(String instance) {
-		this.instance = instance;
-	}
-
-	public HttpStatus getStatusmessageClient() {
-		return statusmessageClient;
-	}
-
-	public void setStatusmessageClient(HttpStatus statusmessageClient) {
-		this.statusmessageClient = statusmessageClient;
-	}
-
-	public String getTituloClient() {
-		return tituloClient;
-	}
-
-	public void setTituloClient(String tituloClient) {
-		this.tituloClient = tituloClient;
+	
+	@ExceptionHandler(ExcepcionesDeNegocio.class)
+	public ResponseEntity<EstandarDeExcepcionesDTO> handleNoContentException(ExcepcionesDeNegocio ex){
+		log.error(ex);
+		HttpStatus estado = ex.getEstado() == null ? HttpStatus.NOT_IMPLEMENTED : ex.getEstado();
+		EstandarDeExcepcionesDTO respuesta = new EstandarDeExcepcionesDTO.ExceptionBuilder()
+				.tipo("ExcepcionesDeNegocio")
+				.titulo(ex.getTitulo())
+				.codigo("E300")
+				.estado(String.valueOf(estado.value()))
+				.detalle(ex.getMessage())
+				.instancia("/xtfValidatorRdm")
+				.builder();
+		return new ResponseEntity<EstandarDeExcepcionesDTO>(respuesta, estado);
 	}
 }

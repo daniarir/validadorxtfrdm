@@ -1,6 +1,6 @@
 package co.gov.igac.snc.structureXtf.dto;
 
-public class Data {
+public class DataDTO {
 	
 	private String rutaArchivo;
     private String nombreArchivo;

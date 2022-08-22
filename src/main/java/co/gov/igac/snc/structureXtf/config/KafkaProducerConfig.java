@@ -1,4 +1,4 @@
-package co.gov.igac.snc.structureXtf.commons;
+package co.gov.igac.snc.structureXtf.config;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -10,7 +10,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
-import co.gov.igac.snc.structureXtf.dto.ResponseArchivoDtoKafka;
+import co.gov.igac.snc.structureXtf.dto.ResponseArchivoDTOKafka;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +22,7 @@ public class KafkaProducerConfig {
     private String bootstrapServers;
 
     @Bean
-    public ProducerFactory<String, ResponseArchivoDtoKafka> userProducerFactory() {
+    public ProducerFactory<String, ResponseArchivoDTOKafka> userProducerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
@@ -31,7 +31,7 @@ public class KafkaProducerConfig {
     }
 
     @Bean
-    public KafkaTemplate<String, ResponseArchivoDtoKafka> userKafkaTemplate() {
+    public KafkaTemplate<String, ResponseArchivoDTOKafka> userKafkaTemplate() {
         return new KafkaTemplate<>(userProducerFactory());
     }
 }

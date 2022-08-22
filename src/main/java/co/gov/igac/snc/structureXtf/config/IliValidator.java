@@ -1,9 +1,10 @@
-package co.gov.igac.snc.structureXtf.commons;
+package co.gov.igac.snc.structureXtf.config;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -12,14 +13,16 @@ import java.util.regex.Pattern;
 import org.interlis2.validator.Validator;
 
 import ch.ehi.basics.settings.Settings;
-import co.gov.igac.snc.structureXtf.exception.AplicacionEstandarDeExcepciones;
+import co.gov.igac.snc.structureXtf.exception.ExcepcionLecturaDeArchivo;
+import co.gov.igac.snc.structureXtf.exception.ExcepcionesDeNegocio;
 import co.gov.igac.snc.structureXtf.util.Utilidades;
 
 import org.json.*;
+import org.springframework.http.HttpStatus;
 
-public class iliValidator {
+public class IliValidator {
 
-	public Settings configIliValidator(String iliDirs, String modelNames, File pathLog) throws AplicacionEstandarDeExcepciones {
+	public Settings configIliValidator(String iliDirs, String modelNames, File pathLog) throws ExcepcionesDeNegocio {
 
 		try {
 			
@@ -34,15 +37,15 @@ public class iliValidator {
 			settingIli.setValue(Validator.SETTING_LOGFILE, path);
 
 			return settingIli;
-
+			
 		} catch (Exception e) {
-			throw new AplicacionEstandarDeExcepciones("/error/xtfValidatorRdm", "Ilivalidator", "E500",
-					"500 - Error interno del servicio",
-					"Error al configurar los settings de la libreria iliValidator" + e.getMessage(), "iliValidator");
+			throw new ExcepcionesDeNegocio("/xtfValidatorRdm/",
+					"Error en la configuracion de la libreria Ilivalidator: " + e.getMessage(),
+					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
-	public void configLogIlivalidator(Boolean validate, File pathLogJson, String nombreArchivo, String origen, String urlUpload) throws AplicacionEstandarDeExcepciones {
+	public void configLogIlivalidator(Boolean validate, File pathLogJson, String nombreArchivo, String origen, String urlUpload) throws ExcepcionesDeNegocio, ExcepcionLecturaDeArchivo {
 
 		// El log que deja la libreria IliValidator, el archivo .LOG no se puede
 		// manipular mientras el .JAR de iliValidator se esta ejecutando,
@@ -152,14 +155,12 @@ public class iliValidator {
 			try {
 				Utilidades.consumirApiValidacionXTF(peticionSubirArchivo, urlUpload);
 			} catch (Exception e) {
-				throw new AplicacionEstandarDeExcepciones("/error/xtfValidatorRdm", "Ilivalidator", "E500",
-						"500 - Error interno del servicio",
-						"Error al configurar el log en formato JSON " + e.getMessage(), "iliValidator");
+				throw new ExcepcionesDeNegocio("/xtfValidatorRdm/",
+						"Error al consumir: " + e.getMessage(),
+						HttpStatus.CONFLICT);
 			}
-		} catch (Exception e) {
-			throw new AplicacionEstandarDeExcepciones("/error/xtfValidatorRdm", "Ilivalidator", "E500",
-					"500 - Error interno del servicio", "Error al configurar el log en formato JSON " + e.getMessage(),
-					"iliValidator");
+		} catch (IOException e) {
+			throw new ExcepcionLecturaDeArchivo("Error leyendo el archivo LOG y convertirlo a JSON: " + e.getMessage());
 		}
 	}
 }
