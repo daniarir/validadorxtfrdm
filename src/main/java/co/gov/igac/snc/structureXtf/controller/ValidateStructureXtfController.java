@@ -1,5 +1,10 @@
 package co.gov.igac.snc.structureXtf.controller;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -9,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.xml.sax.SAXException;
 
 import co.gov.igac.snc.structureXtf.dto.DataDTO;
 import co.gov.igac.snc.structureXtf.dto.RequestArchivoDTO;
@@ -34,9 +40,8 @@ public class ValidateStructureXtfController {
 	private Boolean usaKafka;
 
 	@PostMapping(consumes = { MediaType.APPLICATION_JSON_VALUE })
-	public ResponseEntity<?> validateStructureXtf(@RequestBody RequestArchivoDTO data) throws ExcepcionPropertiesNoExiste, ExcepcionLecturaDeArchivo, ExcepcionesDeNegocio {
+	public ResponseEntity<?> validateStructureXtf(@RequestBody RequestArchivoDTO data) throws ExcepcionPropertiesNoExiste, ExcepcionLecturaDeArchivo, ExcepcionesDeNegocio, TransformerException, ParserConfigurationException, SAXException, IOException, InterruptedException {
 
-		System.out.println("inicio - validateStructureXtf");
 		ResponseArchivoDTO dto = service.validarXtf(data.getRutaArchivo(), data.getNombreArchivo(), data.getOrigen());
 
 		if (usaKafka) {
