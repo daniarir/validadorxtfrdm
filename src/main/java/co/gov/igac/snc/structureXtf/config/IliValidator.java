@@ -50,15 +50,39 @@ public class IliValidator {
 		// El log que deja la libreria IliValidator, el archivo .LOG no se puede
 		// manipular mientras el .JAR de iliValidator se esta ejecutando,
 		// Por lo tanto es imposible Combinar o eliminar el archivo .LOG
-
 		String pathLog = pathLogJson.getPath().replace(".json", ".log");
+		
 		Map<String, String> peticionSubirArchivo = new HashMap<>();
-		String[] pathSplitNombreArchivo = nombreArchivo.split("_");
+		
+		nombreArchivo = nombreArchivo.replace("-", "_").replace("|", "_").replace(",", "_").replace("*", "_");
+		String[] pathSplitNombreArchivo = nombreArchivo.split("_");	
 		String[] pathSplit = pathLogJson.getPath().split("\\\\");
-		String pathFinish = pathSplit[0] + "\\" + pathSplit[1] + "\\" + pathSplitNombreArchivo[1] + "_"
-				+ pathSplitNombreArchivo[2].replace(".xtf", "_ValidacionXTF.json");
-		String nombreArchivoStorage = pathSplitNombreArchivo[1] + "_"
-				+ pathSplitNombreArchivo[2].replace(".xtf", "_ValidacionXTF.json");
+		
+		String pathFinish = null;
+		String nombreArchivoStorage = null;
+		String nombreCarpeta = null;
+
+		if (pathSplitNombreArchivo.length == 1) {
+			nombreCarpeta = nombreArchivo.replace(".xtf", "");
+			pathFinish = pathSplit[0] + "\\" + pathSplit[1] + "\\" + nombreArchivo.replace(".xtf", "_ValidacionXTF.json");
+			nombreArchivoStorage = nombreArchivo.replace(".xtf", "_ValidacionXTF.json");
+		}else {
+			
+			String nombreArchivoStora = null;
+			
+			for (int i = 0; i < pathSplitNombreArchivo.length; i++) {
+				nombreArchivoStora += pathSplitNombreArchivo[i] + "_";
+			}
+			
+			if(nombreArchivoStora.endsWith("_")){
+				nombreArchivoStora = nombreArchivoStora.substring(0,nombreArchivoStora.length() - 1);
+			}
+			nombreArchivoStora = nombreArchivoStora.toLowerCase().replace("null","");
+			nombreCarpeta = pathSplitNombreArchivo[1].replace(".xtf", "");
+			nombreArchivoStorage = nombreArchivoStora.replace(".xtf", "_ValidacionXTF.json");
+			pathFinish = pathSplit[0] + "\\" + pathSplit[1] + "\\" + nombreArchivoStora.replace(".xtf", "_ValidacionXTF.json");
+		}
+
 		String rutaStorage = "procesoRDM/JSON/";
 
 		File doc = new File(pathLog);
@@ -129,7 +153,7 @@ public class IliValidator {
 						data.put("Validation", objectLog);
 					}
 				}
-
+				
 				if (validate) {
 					if (!maError.find()) {
 						data.put("Validation", objectLog);
@@ -144,14 +168,14 @@ public class IliValidator {
 
 			if (origen.equals("SNR")) {
 				peticionSubirArchivo.put("rutaArchivo", pathFinish);
-				peticionSubirArchivo.put("rutaStorage", rutaStorage + origen + "/" + pathSplitNombreArchivo[1]);
+				peticionSubirArchivo.put("rutaStorage", rutaStorage + origen + "/" + nombreCarpeta);
 				peticionSubirArchivo.put("nombreArchivo", nombreArchivoStorage);
 			} else {
 				peticionSubirArchivo.put("rutaArchivo", pathFinish);
-				peticionSubirArchivo.put("rutaStorage", rutaStorage + origen + "/" + pathSplitNombreArchivo[1]);
+				peticionSubirArchivo.put("rutaStorage", rutaStorage + origen + "/" + nombreCarpeta);
 				peticionSubirArchivo.put("nombreArchivo", nombreArchivoStorage);
 			}
-
+			
 			try {
 				Utilidades.consumirApiValidacionXTF(peticionSubirArchivo, urlUpload);
 			} catch (Exception e) {
