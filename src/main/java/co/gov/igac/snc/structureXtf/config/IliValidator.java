@@ -134,7 +134,7 @@ public class IliValidator {
 						String[] lineaError = dataError[1].split(" ");
 						String[] tidError = dataError[3].split(" ");
 
-						if (!lineaError[1].equals("line")) {
+						if (!lineaError[1].toLowerCase().equals("line")) {
 
 							ErrorGeneral.put("Mensaje", strng);
 							arrayErrorLogGeneral.put(ErrorGeneral);
