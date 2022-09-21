@@ -3,6 +3,8 @@ package co.gov.igac.snc.structureXtf.util;
 import java.io.File;
 
 import lombok.Getter;
+import lombok.Setter;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Component;
 @Configuration
 @PropertySource("classpath:validatrStructureXtf.properties")
 @Getter
+@Setter
 @Component
 public class Propiedades {
 
