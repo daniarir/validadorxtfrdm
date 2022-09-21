@@ -7,14 +7,14 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.0</version>
+		<version>2.7.1</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
-	<groupId>co.gov.igac</groupId>
-	<artifactId>validate-structure-xtf</artifactId>
-	<version>1.0</version>
-	<name>validate-structure-xtf</name>
+	<groupId>co.gov.igac.sinic</groupId>
+	<artifactId>xtf-validador</artifactId>
+	<version>1.1</version>
+	<name>xtf-validador</name>
 	<description>Validar estructura de archivos XTF</description>
 	<packaging>jar</packaging>
 
@@ -179,9 +179,9 @@
 
 	<distributionManagement>
 		<repository>
-			<id>igac</id>
+			<id>igac-central</id>
 			<name>Repositorio IGAC releases</name>
-			<url>http://nexus-repo.apps.igac.gov.co/repository/igac-releases/</url>
+			<url>http://nexus-repo.apps.igac.gov.co/repository/igac-central/</url>
 		</repository>
 	</distributionManagement>
 </project>
