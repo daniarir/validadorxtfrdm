@@ -2,6 +2,7 @@ package co.gov.igac.snc.structureXtf.util;
 
 import java.io.File;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Configuration
 @PropertySource("classpath:validatrStructureXtf.properties")
+@Getter
 @Component
 public class Propiedades {
 
@@ -27,76 +29,42 @@ public class Propiedades {
 	@Value("${co.gov.igac.ilivalidator.iliDirs}")
 	private String iliDirs;
 
-	@Value("${co.gov.igac.ilivalidator.modelNames}")
-	private String modelNames;
+	@Value("${co.gov.igac.ilivalidator.modelNamesRIC}")
+	private String modelNamesRIC;
+	
+	@Value("${co.gov.igac.ilivalidator.modelNamesSNR}")
+	private String modelNamesSNR;
 	
 	@Value("${co.gov.igac.ilivalidator.pathLogJSON}")
 	private File pathLogJSON;
+
+	@Value("${accountName}")
+	private String accountName;
+
+	@Value("${accountKey}")
+	private String accountKey;
+
+	@Value("${clientId}")
+	private String clientId;
+
+	@Value("${tenantId}")
+	private String tenantId;
+
+	@Value("${clientSecret}")
+	private String clientSecret;
+
+	@Value("${contenedor}")
+	private String contenedor;
+
+	@Value("${azure.modelos}")
+	private String modelosStorage;
+
+	@Value("${rutaDescargaXtf}")
+	private String rutaDescargaXtf;
+
+	@Value("${rdm.storage.json}")
+	private String storageJson;
 	
-	public Propiedades() {
-		
-	}
-
-	public File getPathLogJSON() {
-		return pathLogJSON;
-	}
-
-	public void setPathLogJSON(File pathLogJSON) {
-		this.pathLogJSON = pathLogJSON;
-	}
-	
-	public String getSubirArchivo() {
-		return subirArchivo;
-	}
-
-	public void setSubirArchivo(String subirArchivo) {
-		this.subirArchivo = subirArchivo;
-	}
-
-	public String getDescargarArchivo() {
-		return descargarArchivo;
-	}
-
-	public void setDescargarArchivo(String descargarArchivo) {
-		this.descargarArchivo = descargarArchivo;
-	}
-
-	public String getPathDefaultAzure() {
-		return pathDefaultAzure;
-	}
-
-	public void setPathDefaultAzure(String pathDefaultAzure) {
-		this.pathDefaultAzure = pathDefaultAzure;
-	}
-	
-	public String getFileSystemClient() {
-		return fileSystemClient;
-	}
-	
-	public void setFileSystemClient(String fileSystemClient) {
-		this.fileSystemClient = fileSystemClient;
-	}
-
-	public String getIliDirs() {
-		return iliDirs;
-	}
-
-	public void setIliDirs(String iliDirs) {
-		this.iliDirs = iliDirs;
-	}
-
-	public String getModelNames() {
-		return modelNames;
-	}
-
-	public void setModelNames(String modelNames) {
-		this.modelNames = modelNames;
-	}
-
-	@Override
-	public String toString() {
-		return "Propiedades [subirArchivo=" + subirArchivo + ", descargarArchivo=" + descargarArchivo
-				+ ", pathDefaultAzure=" + pathDefaultAzure + ", fileSystemClient=" + fileSystemClient + ", iliDirs="
-				+ iliDirs + ", modelNames=" + modelNames + "]";
-	}
+	@Value("${usaKafka}")
+	private Boolean usaKafka;
 }

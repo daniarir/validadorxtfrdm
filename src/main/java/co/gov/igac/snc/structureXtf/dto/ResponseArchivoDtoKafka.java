@@ -1,9 +1,9 @@
 package co.gov.igac.snc.structureXtf.dto;
 
-public class ResponseArchivoDTOKafka {
+public class ResponseArchivoDtoKafka {
 
     private String key;
-    private DataDTO json;
+    private Data json;
 
     public String getKey() {
         return key;
@@ -13,18 +13,18 @@ public class ResponseArchivoDTOKafka {
         this.key = key;
     }
 
-    public DataDTO getJson() {
+    public Data getJson() {
         return json;
     }
 
-    public void setJson(DataDTO json) {
+    public void setJson(Data json) {
         this.json = json;
     }
 
-    public ResponseArchivoDTOKafka() {
+    public ResponseArchivoDtoKafka() {
     }
 
-    public ResponseArchivoDTOKafka(String key, DataDTO json) {
+    public ResponseArchivoDtoKafka(String key, Data json) {
         this.key = key;
         this.json = json;
     }

@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono;
 public class Utilidades {
 
 	public static ResponseEntity<String> consumirApiValidacionXTF(Map<String, String> peticion, String urlApi) throws ExcepcionesDeNegocio {
-
+		
 		ResponseEntity<String> response;
 
 		WebClient webClient = WebClient.builder()
@@ -30,6 +30,6 @@ public class Utilidades {
 										HttpStatus.CONFLICT)))
 				.toEntity(String.class).block();
 		return response;
-
+		
 	}
 }

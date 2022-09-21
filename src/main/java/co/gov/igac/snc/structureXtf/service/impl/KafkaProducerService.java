@@ -6,20 +6,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import co.gov.igac.snc.structureXtf.dto.ResponseArchivoDTOKafka;
+import co.gov.igac.snc.structureXtf.dto.ResponseArchivoDtoKafka;
 
 
 @Service
-public class KafkaProducerServiceImpl {
+public class KafkaProducerService {
 	
-    private final Logger LOG = LoggerFactory.getLogger(KafkaProducerServiceImpl.class);
+    private final Logger LOG = LoggerFactory.getLogger(KafkaProducerService.class);
     
     @Autowired
-    private KafkaTemplate<String, ResponseArchivoDTOKafka> kafkaTemplate;
+    private KafkaTemplate<String, ResponseArchivoDtoKafka> kafkaTemplate;
 
     private final String KAFKA_TOPIC = "validacion-xtf";
 
-    public void send(ResponseArchivoDTOKafka user) {
+    public void send(ResponseArchivoDtoKafka user) {
         LOG.info("Sending User Json Serializer Kafka: ", user);
         kafkaTemplate.send(KAFKA_TOPIC, user);
     }

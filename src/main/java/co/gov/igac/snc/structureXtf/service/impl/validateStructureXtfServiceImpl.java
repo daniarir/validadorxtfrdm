@@ -1,21 +1,17 @@
 package co.gov.igac.snc.structureXtf.service.impl;
 
+import co.gov.igac.snc.structureXtf.util.AzureStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.xml.sax.SAXException;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
-import co.gov.igac.snc.structureXtf.service.IvalidateStructureXtfService;
-import co.gov.igac.snc.structureXtf.util.Utilidades;
+import co.gov.igac.snc.structureXtf.service.ValidateStructureXtfService;
 import co.gov.igac.snc.structureXtf.util.Propiedades;
 
 import org.apache.commons.logging.Log;
@@ -25,61 +21,74 @@ import org.interlis2.validator.Validator;
 import ch.ehi.basics.settings.Settings;
 import co.gov.igac.snc.structureXtf.config.ConfigValidatorXtf;
 import co.gov.igac.snc.structureXtf.config.IliValidator;
-import co.gov.igac.snc.structureXtf.dto.ResponseArchivoDTO;
+import co.gov.igac.snc.structureXtf.dto.Data;
+import co.gov.igac.snc.structureXtf.dto.ResponseArchivoDto;
+import co.gov.igac.snc.structureXtf.dto.ResponseArchivoDtoKafka;
+import co.gov.igac.snc.structureXtf.exception.ExcepcionExecutionException;
+import co.gov.igac.snc.structureXtf.exception.ExcepcionInterruptedException;
 import co.gov.igac.snc.structureXtf.exception.ExcepcionLecturaDeArchivo;
 import co.gov.igac.snc.structureXtf.exception.ExcepcionPropertiesNoExiste;
 import co.gov.igac.snc.structureXtf.exception.ExcepcionesDeNegocio;
 
 @Service
-public class ValidateStructureXtfServiceImpl implements IvalidateStructureXtfService {
+public class ValidateStructureXtfServiceImpl implements ValidateStructureXtfService {
 
 	private final Log log = LogFactory.getLog(getClass());
 
 	@Autowired
 	private Propiedades propiedades;
-	private final IliValidator ilivalidator = new IliValidator();
 
-//	Validar si esta BIEN la estructura o NO
-	public ResponseArchivoDTO validarXtf(String rutaAzureDownload, String nombreArchivo, String origen)
-			throws ExcepcionPropertiesNoExiste, ExcepcionLecturaDeArchivo, ExcepcionesDeNegocio, TransformerException,
-			ParserConfigurationException, SAXException, IOException, InterruptedException {
+	@Autowired
+	private AzureStorage azureStorage;
 
-		ResponseArchivoDTO response = new ResponseArchivoDTO();
+	@Autowired
+	private IliValidator ilivalidator;
+
+	@Autowired
+	KafkaProducerService kafkaProducer;
+
+	@Async("methodAsync")
+	public CompletableFuture<ResponseArchivoDto> validarXtf(String rutaAzureDownload, String nombreArchivo,
+			String origen) throws ExcepcionesDeNegocio, ExcepcionLecturaDeArchivo, ExcepcionInterruptedException,
+			ExcepcionExecutionException, ExcepcionPropertiesNoExiste {
+
+		log.info("Inicio Proceso validarXtf");
+		System.out.println("******************* Inicio Proceso validarXtf ******************");
+		ResponseArchivoDto response = new ResponseArchivoDto();
 		String status = null;
 		Map<String, String> peticionSubirArchivo = new HashMap<>();
-		Map<String, String> peticionDescargarArchivo = new HashMap<>();
-		ResponseEntity<?> respuestApi = null;
 		String typeProcess = "";
 		Boolean valor;
 
 //		PROPERTIES
+		log.info("Variables archivo .properties");
+		System.out.println("******************* Variables archivo .properties ******************");
 		String pathDefault = propiedades.getPathDefaultAzure();
-		String urlDownload = propiedades.getDescargarArchivo();
 		String urlUpload = propiedades.getSubirArchivo();
 		String iliDirs = propiedades.getIliDirs();
-		String modelNames = propiedades.getModelNames();
 		File pathLog = propiedades.getPathLogJSON();
+		Boolean usaKafka = propiedades.getUsaKafka();
 
-		if (pathDefault.isEmpty() || urlDownload.isEmpty() || urlUpload.isEmpty() || iliDirs.isEmpty()
-				|| modelNames.isEmpty() || pathLog.toString().isEmpty()) {
-			throw new ExcepcionPropertiesNoExiste("No se encontro datos en el properties: ", HttpStatus.NOT_FOUND);
+		log.info("Descargando archivo XTF");
+		System.out.println("******************* Descargando archivo XTF ******************");
+		String pathConvert = azureStorage.descargarArchivo(rutaAzureDownload, nombreArchivo, propiedades.getRutaDescargaXtf());
+
+		log.info("Obteniendo el tipo de modelo RIC o SNR");
+		System.out.println("******************* Obteniendo el tipo de modelo RIC o SNR ******************");
+		String modelNames = ilivalidator.nombreTipoModelo(pathConvert);
+
+		if (!new File(iliDirs + "\\\\" + modelNames).exists()) {
+			log.info("Descargando Modelos");
+			System.out.println("******************* Descargando Modelos ******************");
+			azureStorage.descargarModelos(propiedades.getModelosStorage(), iliDirs);
 		}
 
-//		Inicializar configuraciones de la libreria IliValidator
-		Settings settingIli = ilivalidator.configIliValidator(iliDirs, modelNames, pathLog);
+		log.info("Configurando settings para iliValidator");
+		System.out.println("******************* Configurando settings para iliValidator ******************");
+		CompletableFuture<Settings> settingIli = ilivalidator.configIliValidator(iliDirs, modelNames, pathLog);
 
-		peticionDescargarArchivo.put("rutaStorage", rutaAzureDownload);
-		peticionDescargarArchivo.put("nombreArchivo", nombreArchivo);
-		respuestApi = Utilidades.consumirApiValidacionXTF(peticionDescargarArchivo, urlDownload);
-
-		if (!respuestApi.getStatusCode().is2xxSuccessful()) {
-			throw new ExcepcionesDeNegocio(respuestApi.getBody().toString(),
-					"Error consumiendo " + peticionDescargarArchivo, HttpStatus.CONFLICT);
-		}
-
-		String pathConvert = respuestApi.getBody().toString();
-
-//		Ajustes bugs para el archivo XTF
+		log.info("Ajustes bugs archivo XTF");
+		System.out.println("******************* Ajustes bugs archivo XTF ******************");
 		ConfigValidatorXtf.ajustesBugsValidatorXTF(pathConvert);
 
 		try {
@@ -92,16 +101,16 @@ public class ValidateStructureXtfServiceImpl implements IvalidateStructureXtfSer
 			}
 
 			convertRoute = convertRoute.substring(0, convertRoute.length() - 1);
-
-			String extensionFile = nombreArchivo.toLowerCase().substring(nombreArchivo.length() - 4,
-					nombreArchivo.length());
+			String extensionFile = nombreArchivo.toLowerCase().substring(nombreArchivo.length() - 4, nombreArchivo.length());
 
 			if (!extensionFile.equals(".xtf")) {
 				throw new ExcepcionesDeNegocio("/error/xtfValidatorRdm",
 						"Validacion del archivo XTF no permitido: " + extensionFile, HttpStatus.INTERNAL_SERVER_ERROR);
 			} else {
 
-				valor = Validator.runValidation(convertRoute, settingIli);
+				log.info("Ejecutando libreria iliValidator");
+				System.out.println("******************* Ejecutando libreria iliValidator ******************");
+				valor = Validator.runValidation(convertRoute, settingIli.get());
 
 				if (valor.equals(false)) {
 					status = "0";
@@ -132,30 +141,47 @@ public class ValidateStructureXtfServiceImpl implements IvalidateStructureXtfSer
 		} catch (Exception e) {
 			throw new ExcepcionesDeNegocio("/error/xtfValidatorRdm",
 					"Error en la implantacion del servicio:: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-
 		}
 
-		respuestApi = Utilidades.consumirApiValidacionXTF(peticionSubirArchivo, urlUpload);
+		log.info("Subiendo Archivo XTF en el azure Storage");
+		System.out.println("******************* Subiendo Archivo XTF en el azure Storage ******************");
+		azureStorage.subirArchivoGrande(peticionSubirArchivo.get("rutaArchivo"), peticionSubirArchivo.get("rutaStorage"), peticionSubirArchivo.get("nombreArchivo"));
 
-		if (!respuestApi.getStatusCode().is2xxSuccessful()) {
-			throw new ExcepcionesDeNegocio(respuestApi.getBody().toString(),
-					"Error consumiendo " + peticionSubirArchivo, HttpStatus.CONFLICT);
-		}
-
+		log.info("Configurando Log.json errores libreria iliValidator");
+		System.out.println("******************* Configurando Log.json errores libreria iliValidator ******************");
 		ilivalidator.configLogIlivalidator(valor, pathLog, nombreArchivo, origen, urlUpload);
 
 		response.setRutaArchivo(pathDefault + origen + typeProcess);
 		response.setNombreArchivo(nombreArchivo);
 		response.setCodigoStatus(status);
 		response.setOrigen(origen);
+
+		log.info("Eliminando archivo");
+		System.out.println("******************* Eliminando archivo ******************");
 		eliminarArchivo(new File(pathConvert));
-		return response;
+
+		if (usaKafka) {
+			log.info("Enviando mensaje al topic Kafka");
+			System.out.println("******************* Enviando mensaje al topic Kafka ******************");
+			ResponseArchivoDtoKafka dtoKafka = new ResponseArchivoDtoKafka();
+			Data dataKafka = new Data();
+			dataKafka.setRutaArchivo(peticionSubirArchivo.get("rutaStorage"));
+			dataKafka.setNombreArchivo(peticionSubirArchivo.get("nombreArchivo"));
+			dataKafka.setOrigen(origen);
+			dtoKafka.setKey("OK");
+			dtoKafka.setJson(dataKafka);
+			kafkaProducer.send(dtoKafka);
+		}
+
+		log.info("Termino Proceso validarXtf");
+		System.out.println("******************* Termino Proceso validarXtf ******************");
+		return CompletableFuture.completedFuture(response);
 	}
 
 	private void eliminarArchivo(File archivo) {
-		if (archivo.exists()) {
-			System.gc();
-			log.info("File Eliminar archivo " + archivo.getPath() + ": " + archivo.delete());
-		}
+		
+	   if (archivo.exists()) {
+	      System.gc();
+	   } 
 	}
 }
