@@ -18,6 +18,13 @@
 	<description>Validar estructura de archivos XTF</description>
 	<packaging>jar</packaging>
 
+	<repositories>
+		<repository>
+			<id>igac-central</id>
+			<url>http://nexus-repo.apps.igac.gov.co/repository/igac-central/</url>
+		</repository>
+	</repositories>
+
 	<properties>
 		<java.version>11</java.version>
 	</properties>
@@ -132,11 +139,13 @@
 			<artifactId>commons-io</artifactId>
 			<version>2.11.0</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.azure</groupId>
 			<artifactId>azure-storage-file-datalake</artifactId>
 			<version>12.6.0</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.azure</groupId>
 			<artifactId>azure-identity</artifactId>
@@ -148,6 +157,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
@@ -177,11 +187,4 @@
 		</plugins>
 	</build>
 
-	<distributionManagement>
-		<repository>
-			<id>igac-central</id>
-			<name>Repositorio IGAC releases</name>
-			<url>http://nexus-repo.apps.igac.gov.co/repository/igac-central/</url>
-		</repository>
-	</distributionManagement>
 </project>
