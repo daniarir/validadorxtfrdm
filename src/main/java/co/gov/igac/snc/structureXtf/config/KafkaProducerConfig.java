@@ -31,7 +31,7 @@ public class KafkaProducerConfig {
     private String kafkaPwd;
 
     @Bean
-     public ProducerFactory<String, MensajeKafkaDTO> userProducerFactory() {
+     public ProducerFactory<String, ResponseArchivoDtoKafka> userProducerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, propiedades.getKafkaServers());
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
