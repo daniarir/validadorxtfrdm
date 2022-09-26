@@ -24,10 +24,10 @@ public class KafkaProducerConfig {
     @Value("${kafka.bootstrap-servers}")
     private String bootstrapServers;
 
-    @Value("${kafka.bootstrap-user}")
+    @Value("${kafka.user}")
     private String kafkaUser;
 
-    @Value("${kafka.bootstrap-pwd}")
+    @Value("${kafka.pwd}")
     private String kafkaPwd;
 
     @Bean
