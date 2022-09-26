@@ -70,4 +70,11 @@ public class Propiedades {
 	
 	@Value("${usaKafka}")
 	private Boolean usaKafka;
+    
+	@Value("${kafka.user}")
+    private String kafkaUser;
+
+    @Value("${kafka.pwd}")
+    private String kafkaPwd;
+	
 }
