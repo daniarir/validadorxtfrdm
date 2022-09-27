@@ -10,7 +10,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.apache.kafka.clients.CommonClientConfigs;
-import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.config.SaslConfigs;
 
 import co.gov.igac.snc.structureXtf.dto.ResponseArchivoDtoKafka;
