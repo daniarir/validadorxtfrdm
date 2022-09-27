@@ -69,11 +69,11 @@ public class ValidateStructureXtfServiceImpl implements ValidateStructureXtfServ
 		File pathLog = propiedades.getPathLogJSON();
 		Boolean usaKafka = propiedades.getUsaKafka();
 
-		log.info("Descargando archivo XTF");
+		log.info("Descargando archivo " + nombreArchivo + " XTF");
 		System.out.println("******************* Descargando archivo XTF ******************");
 		String pathConvert = azureStorage.descargarArchivo(rutaAzureDownload, nombreArchivo, propiedades.getRutaDescargaXtf());
 
-		log.info("Obteniendo el tipo de modelo RIC o SNR");
+		log.info("Obteniendo el tipo de modelo RIC o SNR ");
 		System.out.println("******************* Obteniendo el tipo de modelo RIC o SNR ******************");
 		String modelNames = ilivalidator.nombreTipoModelo(pathConvert);
 
@@ -143,11 +143,11 @@ public class ValidateStructureXtfServiceImpl implements ValidateStructureXtfServ
 					"Error en la implantacion del servicio:: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		log.info("Subiendo Archivo XTF en el azure Storage");
+		log.info("Subiendo Archivo XTF " +  nombreArchivo + " en el azure Storage");
 		System.out.println("******************* Subiendo Archivo XTF en el azure Storage ******************");
 		azureStorage.subirArchivoGrande(peticionSubirArchivo.get("rutaArchivo"), peticionSubirArchivo.get("rutaStorage"), peticionSubirArchivo.get("nombreArchivo"));
 
-		log.info("Configurando Log.json errores libreria iliValidator");
+		log.info("Configurando Log.json para libreria iliValidator");
 		System.out.println("******************* Configurando Log.json errores libreria iliValidator ******************");
 		ilivalidator.configLogIlivalidator(valor, pathLog, nombreArchivo, origen, urlUpload);
 
