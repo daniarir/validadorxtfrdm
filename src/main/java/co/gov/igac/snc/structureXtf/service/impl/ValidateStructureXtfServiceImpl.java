@@ -168,7 +168,11 @@ public class ValidateStructureXtfServiceImpl implements ValidateStructureXtfServ
 			dataKafka.setRutaArchivo(peticionSubirArchivo.get("rutaStorage"));
 			dataKafka.setNombreArchivo(peticionSubirArchivo.get("nombreArchivo"));
 			dataKafka.setOrigen(origen);
-			dtoKafka.setKey("OK");
+			if(typeProcess.equals("Procesados")){
+				dtoKafka.setKey("OK");
+			}else{
+				dtoKafka.setKey("NOK");
+			}
 			dtoKafka.setJson(dataKafka);
 			kafkaProducer.send(dtoKafka);
 		}
